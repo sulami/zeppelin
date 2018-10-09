@@ -5,5 +5,5 @@
 
 (def router
   (compojure/routes
-   (GET "/status" [] handlers/status-handler)
-   (route/not-found handlers/not-found-handler)))
+   (GET "/status" [] (handlers/json-handler handlers/status-handler))
+   (route/not-found (handlers/json-handler handlers/not-found-handler))))
