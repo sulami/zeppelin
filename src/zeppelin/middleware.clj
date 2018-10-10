@@ -11,15 +11,17 @@
         (update-in [:headers] #(into % {"content-type" "application/json"})))))
 
 (defn- format-request
-  "Pretty print a request."
-  [req]
-  (format "%s %s"
+  "Pretty print a request & response."
+  [req resp]
+  (format "%s %s %s"
           (:request-method req)
-          (:uri req)))
+          (:uri req)
+          (:status resp)))
 
 (defn wrap-log-request
   "Log all incoming requests to stdout."
   [handler]
   (fn wrap-log-request-wrapper [req]
-    (-> req format-request println)
-    (handler req)))
+    (let [resp (handler req)]
+      (println (format-request req resp))
+      (handler req))))
