@@ -1,14 +1,4 @@
-(ns zeppelin.handlers
-  (:require [cheshire.core :refer [generate-string]]))
-
-(defn json-handler
-  "Encode a response body in JSON and set the content-type."
-  [handler]
-  (fn json-handler-wrapper [req]
-    (-> req
-        handler
-        (update-in [:body] generate-string)
-        (update-in [:headers] #(into % {"content-type" "application/json"})))))
+(ns zeppelin.handlers)
 
 (defn not-found-handler
   [req]
