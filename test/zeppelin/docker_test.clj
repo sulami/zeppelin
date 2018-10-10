@@ -16,3 +16,15 @@
                 (apply run-command)
                 deref
                 :out)))))
+
+(deftest docker-run-command-test
+  (testing "it prefixes the command properly"
+    (is (= ["docker" "run" "--rm" "alpine:3.7" "echo" "-n" "docker"]
+           (docker-run-cmd "alpine:3.7" ["echo" "-n" "docker"])))))
+
+(deftest run-container-test
+  (testing "it returns a container"
+    (is (= "docker"
+           (-> (run-container "alpine:3.7" ["echo" "-n" "docker"])
+               deref
+               :out)))))
