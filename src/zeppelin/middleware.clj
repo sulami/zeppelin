@@ -1,5 +1,6 @@
 (ns zeppelin.middleware
-  (:require [cheshire.core :refer [generate-string]]))
+  (:require [cheshire.core :refer [generate-string]]
+            [zeppelin.utils :refer [log]]))
 
 (defn wrap-json-response
   "Encode a response body in JSON and set the content-type."
@@ -19,9 +20,9 @@
           (:status resp)))
 
 (defn wrap-log-request
-  "Log all incoming requests to stdout."
+  "Log all requests & responses."
   [handler]
-  (fn wrap-log-request-wrapper [req]
+  (fn wraplog-request-wrapper [req]
     (let [resp (handler req)]
-      (println (format-request req resp))
-      (handler req))))
+      (log (format-request req resp))
+      resp)))
