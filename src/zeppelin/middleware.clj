@@ -7,7 +7,7 @@
   (fn wrap-json-response-wrapper [req]
     (-> req
         handler
-        (update-in [:body] generate-string)
+        (update-in [:body] #(generate-string % {:pretty true}))
         (update-in [:headers] #(into % {"content-type" "application/json"})))))
 
 (defn- format-request
