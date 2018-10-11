@@ -1,9 +1,23 @@
 (ns zeppelin.master
   (:require [clojure.core.async :refer [>!! chan go]]))
 
-;; Initial master state upon boot.
+;; TODO spec this
+(def initial-master-state
+  "Initial master state upon boot."
+  {:builds []})
+
+(defn new-build
+  "New build state when added."
+  [params]
+  (into {} params))
+
 (defonce master-state
-  (atom {}))
+  (atom initial-master-state))
+
+(defn start-build
+  "Kick off a build."
+  [state params]
+  (update-in state [:builds] #(conj % (new-build params))))
 
 (defn query-master
   "Run a query on the master.
