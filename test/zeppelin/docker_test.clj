@@ -2,29 +2,24 @@
   (:require [zeppelin.docker :refer :all]
             [clojure.test :refer :all]))
 
-(deftest run-command-test
-  (testing "it returns a promise"
-    (is (future? (run-command "true"))))
+(def docker-command-prefix
+  "This is the standard docker run command prefix."
+  ["docker" "run" "--rm"])
 
-  (testing "it returns the correct return code"
-    (is (= 0 (-> "true" run-command deref :exit)))
-    (is (= 1 (-> "false" run-command deref :exit))))
-
-  (testing "it returns the correct output"
-    (is (= "zeppelin"
-           (->> ["echo" "-n" "zeppelin"]
-                (apply run-command)
-                deref
-                :out)))))
-
-(deftest docker-run-command-test
+(deftest docker-run-cmd-test
   (testing "it prefixes the command properly"
     (is (= ["docker" "run" "--rm" "alpine:3.7" "echo" "-n" "docker"]
            (docker-run-cmd "alpine:3.7" ["echo" "-n" "docker"])))))
 
 (deftest run-container-test
-  (testing "it returns a container"
-    (is (= "docker"
-           (-> (run-container "alpine:3.7" ["echo" "-n" "docker"])
-               deref
-               :out)))))
+  (testing "it runs a container and returns the output"
+    (with-redefs-fn
+      {#'run-command
+       (fn run-command-mock [& cmd]
+         (is (= (concat docker-command-prefix ["image" "command"])
+                cmd))
+         (future {:out "docker"}))}
+      #(is (= "docker"
+             (-> (run-container "image" ["command"])
+                 deref
+                 :out))))))
