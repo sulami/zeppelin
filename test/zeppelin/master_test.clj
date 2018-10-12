@@ -22,14 +22,46 @@
   (testing "it adds a build to the state"
     (is (= 1
            (-> initial-master-state
-               (start-build {})
+               start-build
                :builds
                count))))
 
   (testing "it adds parameters to the new build"
-    (let [params {:id 1}]
-      (is (= params
-             (-> initial-master-state
-                 (start-build params)
+    (is (= "zeppelin"
+           (-> initial-master-state
+               (start-build {:image "zeppelin"})
+               :builds
+               (get 1)
+               :image))))
+
+  (testing "it increments the id for every new build"
+    (is (= [1 2]
+           (-> initial-master-state
+               start-build
+               start-build
+               :builds
+               keys))))
+
+  (testing "it sets the build state to :running"
+    (is (= :running
+           (-> initial-master-state
+               start-build
+               :builds
+               (get 1)
+               :state)))))
+
+(deftest finish-build-test
+  (testing "it requires the build to exist"
+    (is (= initial-master-state
+           (-> initial-master-state
+               (finish-build 1)))))
+
+  (testing "it updates the build state"
+    (let [state (-> initial-master-state
+                    start-build
+                    (finish-build 1))]
+      (is (= :finished
+             (-> state
                  :builds
-                 first))))))
+                 (get 1)
+                 :state))))))
